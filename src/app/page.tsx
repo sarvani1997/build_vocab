@@ -1,113 +1,165 @@
-import Image from 'next/image'
+"use client";
+import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
+
+const vocab = [
+  { letter: "A", word: "Apple", picture: "/vocab_img/apple.jpeg" },
+  { letter: "B", word: "Ball", picture: "/vocab_img/ball.webp" },
+  {
+    letter: "C",
+    word: "Cat",
+    picture: "/vocab_img/cat.webp",
+    sound: "/sounds/cat.mp3",
+  },
+  {
+    letter: "D",
+    word: "Dog",
+    picture: "/vocab_img/dog.webp",
+    sound: "/sounds/dog.mp3",
+  },
+  {
+    letter: "E",
+    word: "Elephant",
+    picture: "/vocab_img/elephant.webp",
+    sound: "/sounds/elephant.wav",
+  },
+  { letter: "F", word: "Fox", picture: "/vocab_img/fox.jpeg" },
+  { letter: "G", word: "Giraffe", picture: "/vocab_img/giraffe.jpeg" },
+  { letter: "H", word: "Hat", picture: "/vocab_img/hat.jpeg" },
+  { letter: "I", word: "Icecream", picture: "/vocab_img/icecream.jpeg" },
+  { letter: "J", word: "Jug", picture: "/vocab_img/jug.jpeg" },
+  { letter: "K", word: "Kite", picture: "/vocab_img/kite.jpeg" },
+  { letter: "L", word: "Lion", picture: "/vocab_img/lion.jpeg" },
+  { letter: "M", word: "Mango", picture: "/vocab_img/mango.jpeg" },
+  { letter: "N", word: "Nest", picture: "/vocab_img/nest.jpeg" },
+  { letter: "O", word: "Orange", picture: "/vocab_img/orange.jpeg" },
+  { letter: "P", word: "Parrot", picture: "/vocab_img/parrot.jpeg" },
+  { letter: "Q", word: "Quiet", picture: "/vocab_img/quiet.jpeg" },
+  { letter: "R", word: "Rabbit", picture: "/vocab_img/rabbit.jpeg" },
+  { letter: "S", word: "Snake", picture: "/vocab_img/snake.jpeg" },
+  { letter: "T", word: "Train", picture: "/vocab_img/train.jpeg" },
+  { letter: "U", word: "Umbrella", picture: "/vocab_img/umbrella.jpeg" },
+  { letter: "V", word: "Van", picture: "/vocab_img/van.jpeg" },
+  { letter: "W", word: "Watch", picture: "/vocab_img/watch.jpeg" },
+  { letter: "X", word: "Xylophone", picture: "/vocab_img/xylophone.jpeg" },
+  { letter: "Y", word: "Yak", picture: "/vocab_img/yak.jpeg" },
+  { letter: "Z", word: "Zip", picture: "/vocab_img/zip.jpeg" },
+];
 
 export default function Home() {
+  const inputRef = useRef(null);
+  let [count, setCount] = useState(0);
+  let [internalCount, setInternalCount] = useState("picture");
+
+  const onKeyDown = function (event) {
+    // Handle the keypress event here
+    console.log("Keypress event:", event.key);
+    if (event.key === "ArrowLeft") {
+      // Handle the left arrow key
+      prev();
+      console.log("Left arrow key pressed");
+    } else if (event.key === "ArrowRight") {
+      // Handle the right arrow key
+      next();
+      console.log("Right arrow key pressed");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onKeyDown]);
+
+  const prev = () => {
+    if (internalCount === "letter") {
+      setInternalCount("picture");
+    } else if (internalCount === "picture") {
+      setCount(count - 1);
+      setInternalCount("picture");
+    }
+  };
+
+  const next = () => {
+    if (internalCount === "picture") {
+      setInternalCount("letter");
+    } else if (internalCount === "letter") {
+      setCount(count + 1);
+      setInternalCount("picture");
+    }
+  };
+
+  const handleClick = () => {
+    if (inputRef.current) {
+      inputRef.current.play();
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <div className="flex">
+        <button disabled={count === 0} onClick={prev} className="p-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-10 h-10"
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
-          </a>
+          </svg>
+        </button>
+        <div className="h-[500px] w-[500px] text-center">
+          {internalCount === "picture" ? (
+            <div>
+              {vocab[count].sound && (
+                <audio controls autoPlay ref={inputRef} className="invisible">
+                  <source src={vocab[count].sound} />
+                  Your browser does not support the audio element.
+                </audio>
+              )}
+              <img
+                src={vocab[count][internalCount]}
+                onClick={handleClick}
+                className="inline-block h-[500px] rounded-md"
+              />
+            </div>
+          ) : (
+            <div className="">
+              <div className="text-[200px] font-bold">
+                {vocab[count].letter}
+              </div>
+              <div className="text-[80px]">{vocab[count].word}</div>
+            </div>
+          )}
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          className="p-4"
+          disabled={count === vocab.length - 1 && internalCount == "letter"}
+          onClick={next}
         >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-10 h-10"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </button>
       </div>
     </main>
-  )
+  );
 }
