@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const vocab = [
   { letter: "A", word: "Apple", picture: "/vocab_img/apple.jpeg" },
@@ -47,48 +47,47 @@ const vocab = [
 ];
 
 export default function Home() {
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLAudioElement>(null);
   let [count, setCount] = useState(0);
   let [internalCount, setInternalCount] = useState("picture");
 
-  const onKeyDown = function (event) {
-    // Handle the keypress event here
-    console.log("Keypress event:", event.key);
-    if (event.key === "ArrowLeft") {
-      // Handle the left arrow key
-      prev();
-      console.log("Left arrow key pressed");
-    } else if (event.key === "ArrowRight") {
-      // Handle the right arrow key
-      next();
-      console.log("Right arrow key pressed");
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [onKeyDown]);
-
-  const prev = () => {
+  const prev = useCallback(() => {
     if (internalCount === "letter") {
       setInternalCount("picture");
     } else if (internalCount === "picture") {
       setCount(count - 1);
       setInternalCount("picture");
     }
-  };
+  }, [count, internalCount]);
 
-  const next = () => {
+  const next = useCallback(() => {
     if (internalCount === "picture") {
       setInternalCount("letter");
     } else if (internalCount === "letter") {
       setCount(count + 1);
       setInternalCount("picture");
     }
-  };
+  }, [count, internalCount]);
+
+  useEffect(() => {
+    const onKeyDown = function (event: KeyboardEvent) {
+      // Handle the keypress event here
+      console.log("Keypress event:", event.key);
+      if (event.key === "ArrowLeft") {
+        // Handle the left arrow key
+        prev();
+        console.log("Left arrow key pressed");
+      } else if (event.key === "ArrowRight") {
+        // Handle the right arrow key
+        next();
+        console.log("Right arrow key pressed");
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [next, prev]);
 
   const handleClick = () => {
     if (inputRef.current) {
@@ -124,10 +123,13 @@ export default function Home() {
                   Your browser does not support the audio element.
                 </audio>
               )}
-              <img
+              <Image
                 src={vocab[count][internalCount]}
                 onClick={handleClick}
-                className="inline-block h-[500px] rounded-md"
+                alt="image"
+                className="rounded-md"
+                height={500}
+                width={500}
               />
             </div>
           ) : (
