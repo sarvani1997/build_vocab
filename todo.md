@@ -1,0 +1,5 @@
+- [ ] replace picture
+- [ ] add audios
+- [ ] use-gestures
+- [ ] responsiveness
+- [x] make the home page to start the game
